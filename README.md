@@ -5,6 +5,7 @@ The Markdown to HTML Converter is a command-line tool written in Rust that allow
 ## Features
 
 - Convert Markdown files to HTML.
+- Enhanced command-line interface with argument parsing.
 - Support for common Markdown syntax, including headings, paragraphs, lists, emphasis, links, images, and code blocks.
 - Options to enable tables and strikethrough formatting.
 - Save the generated HTML to a file.
@@ -43,18 +44,20 @@ cargo build --release
 To convert a Markdown file to HTML, run the following command:
 
 ```console
-cargo run -- <input-file> <output-file>
+cargo run --release -- -i <input-file> -o <output-file> [--theme <theme-name>]
+
 
 ```
 
 
 
-Replace `<input-file>` with the path to your Markdown file and `<output-file>` with the desired path for the HTML output file.
+Replace <input-file> with the path to your Markdown file and <output-file> with the desired path for the HTML output file. Optionally, specify a theme with the --theme flag (available themes: default, dark, light).
 
-For example, to convert a file named `example.md` to HTML and save it as `output.html`, run the following command:
+For example, to convert a file named example.md to HTML with a dark theme and save it as output.html, run the following command:
 
 ```console
-cargo run -- example.md output.html
+cargo run --release -- -i example.md -o output.html --theme dark
+
 
 ```
 
@@ -64,6 +67,7 @@ The HTML output will be saved to the specified file.
 
 ## Options
 
+-Theming: Use the --theme flag followed by a theme name to specify the theme for the output HTML. Available themes are default, dark, and light.
 - Enable Tables: To enable support for tables in the Markdown input, pass the `--tables` flag:
 
 ```console

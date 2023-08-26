@@ -1,9 +1,7 @@
-// main.rs
-
-use std::env;
 use std::fs;
 use std::io::{self, Read};
 use pulldown_cmark::{html, Options, Parser};
+use clap::{Arg, App};
 
 fn convert_markdown_to_html(input: &str) -> String {
     let mut options = Options::empty();
@@ -28,23 +26,43 @@ fn save_html_to_file(html: &str, output_file_path: &str) -> Result<(), std::io::
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let matches = App::new("Rust Markdown Converter")
+        .version("1.0")
+        .author("Your Name")
+        .about("Converts Markdown to HTML")
+        .arg(Arg::with_name("input")
+             .help("Input markdown file")
+             .required(true)
+             .index(1))
+        .arg(Arg::with_name("output")
+             .help("Output HTML file")
+             .required(true)
+             .index(2))
+        .arg(Arg::with_name("theme")
+             .help("CSS theme for the output. Available: default, dark, light")
+             .takes_value(true)
+             .default_value("default"))
+        .get_matches();
 
-    if args.len() != 3 {
-        eprintln!("Usage: rust-markdown-converter <input-file> <output-file>");
-        return;
-    }
+    let input_file_path = matches.value_of("input").unwrap();
+    let output_file_path = matches.value_of("output").unwrap();
+    let theme = matches.value_of("theme").unwrap();
 
-    let input_file_path = &args[1];
-    let output_file_path = &args[2];
+    // Basic theming (for demonstration purposes)
+    let css = match theme {
+        "dark" => "<style>body { background-color: black; color: white; }</style>",
+        "light" => "<style>body { background-color: white; color: black; }</style>",
+        _ => "", // default theme
+    };
 
     match convert_file_to_html(input_file_path) {
-        Ok(html) => {
+        Ok(mut html) => {
+            html.insert_str(0, css); // Prepend the CSS to the HTML output
             match save_html_to_file(&html, output_file_path) {
-                Ok(_) => println!("Conversion successful. HTML saved to {}",output_file_path),
+                Ok(_) => println!("Conversion successful. HTML saved to {}", output_file_path),
                 Err(err) => eprintln!("Error saving HTML to file: {}", err),
-                }
-                },
-                Err(err) => eprintln!("Error converting file to HTML: {}", err),
-                }
-                }
+            }
+        },
+        Err(err) => eprintln!("Error converting file to HTML: {}", err),
+    }
+}
