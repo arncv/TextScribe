@@ -68,6 +68,12 @@ The HTML output will be saved to the specified file.
 ## Options
 
 -Theming: Use the --theme flag followed by a theme name to specify the theme for the output HTML. Available themes are default, dark, and light.
+    
+    ```console
+    cargo run --release -- -i <input-file> -o <output-file> --theme <theme-name>
+    
+    ```
+    
 - Enable Tables: To enable support for tables in the Markdown input, pass the `--tables` flag:
 
 ```console
