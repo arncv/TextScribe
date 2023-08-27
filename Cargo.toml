@@ -10,4 +10,5 @@ pulldown-cmark = "0.9.3"
 clap = "2.33"
 clipboard = "0.5"
 webbrowser = "0.5"
+base64 = "0.13"
 

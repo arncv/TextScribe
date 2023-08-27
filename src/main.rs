@@ -1,9 +1,32 @@
 use std::fs;
+use std::path::Path;
 use pulldown_cmark::{html, Options, Parser};
 use clap::{Arg, App};
 use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
 use webbrowser;
+use base64;
+
+fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
+    let img_tag_pattern = "<img src=\"";
+    let mut index = 0;
+
+    while let Some(start) = html_output[index..].find(img_tag_pattern) {
+        let start = start + index;
+        let end = html_output[start..].find("\"").unwrap() + start;
+        let img_path_str = &html_output[start + img_tag_pattern.len()..end];
+        let img_path = base_path.join(img_path_str);
+
+        if let Ok(img_data) = fs::read(img_path) {
+            let encoded = base64::encode(&img_data);
+            let data_url = format!("data:image/png;base64,{}", encoded); // Assuming PNG, adjust accordingly
+            html_output.replace_range(start + img_tag_pattern.len()..end, &data_url);
+        }
+
+        index = end;
+    }
+}
+
 
 fn convert_markdown_to_html(input: &str) -> String {
     let options = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH;
@@ -71,6 +94,9 @@ fn main() {
         Ok(mut html) => {
             html.insert_str(0, css); // Prepend the CSS to the HTML output
             
+            let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
+            embed_images_as_base64(&mut html, base_path);
+
             if use_clipboard {
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                 ctx.set_contents(html.clone()).expect("Failed to copy to clipboard");
