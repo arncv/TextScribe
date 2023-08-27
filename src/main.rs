@@ -1,6 +1,8 @@
 use std::fs;
 use pulldown_cmark::{html, Options, Parser};
 use clap::{Arg, App};
+use clipboard::ClipboardProvider;
+use clipboard::ClipboardContext;
 
 fn convert_markdown_to_html(input: &str) -> String {
     let options = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH;
@@ -42,27 +44,42 @@ fn main() {
              .index(1))
         .arg(Arg::with_name("output")
              .help("Output HTML file")
-             .required(true)
+             .required(false)
              .index(2))
         .arg(Arg::with_name("theme")
              .help("CSS theme for the output. Available: default, dark, light")
              .takes_value(true)
              .default_value("default"))
+        .arg(Arg::with_name("clipboard")
+             .help("Output the generated HTML directly to the clipboard")
+             .short("c")
+             .long("clipboard")
+             .takes_value(false))
         .get_matches();
 
     let input_file_path = matches.value_of("input").expect("Failed to get input file path");
-    let output_file_path = matches.value_of("output").expect("Failed to get output file path");
+    let output_file_path = matches.value_of("output");
     let theme = matches.value_of("theme").expect("Failed to get theme");
+    let use_clipboard = matches.is_present("clipboard");
 
     let css = get_theme_css(theme);
 
     match convert_file_to_html(input_file_path) {
         Ok(mut html) => {
             html.insert_str(0, css); // Prepend the CSS to the HTML output
-            if let Err(err) = save_html_to_file(&html, output_file_path) {
-                eprintln!("Error saving HTML to file: {}", err);
+            
+            if use_clipboard {
+                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                ctx.set_contents(html.clone()).expect("Failed to copy to clipboard");
+                println!("HTML copied to clipboard!");
+            } else if let Some(output_path) = output_file_path {
+                if let Err(err) = save_html_to_file(&html, output_path) {
+                    eprintln!("Error saving HTML to file: {}", err);
+                } else {
+                    println!("Conversion successful. HTML saved to {}", output_path);
+                }
             } else {
-                println!("Conversion successful. HTML saved to {}", output_file_path);
+                eprintln!("Please specify an output file or use the --clipboard option.");
             }
         },
         Err(err) => eprintln!("Error converting file to HTML: {}", err),
