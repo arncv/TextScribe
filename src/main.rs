@@ -3,6 +3,7 @@ use pulldown_cmark::{html, Options, Parser};
 use clap::{Arg, App};
 use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
+use webbrowser;
 
 fn convert_markdown_to_html(input: &str) -> String {
     let options = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH;
@@ -25,11 +26,7 @@ fn get_theme_css(theme: &str) -> &str {
     match theme {
         "dark" => "<style>body { background-color: black; color: white; }</style>",
         "light" => "<style>body { background-color: white; color: black; }</style>",
-        "default" => "",
-        _ => {
-            eprintln!("Warning: Unrecognized theme '{}'. Using default theme.", theme);
-            ""
-        }
+        _ => "", // default theme
     }
 }
 
@@ -55,12 +52,18 @@ fn main() {
              .short("c")
              .long("clipboard")
              .takes_value(false))
+        .arg(Arg::with_name("browser")
+             .help("Preview the generated HTML in the default web browser")
+             .short("b")
+             .long("browser")
+             .takes_value(false))
         .get_matches();
 
     let input_file_path = matches.value_of("input").expect("Failed to get input file path");
     let output_file_path = matches.value_of("output");
     let theme = matches.value_of("theme").expect("Failed to get theme");
     let use_clipboard = matches.is_present("clipboard");
+    let preview_in_browser = matches.is_present("browser");
 
     let css = get_theme_css(theme);
 
@@ -72,14 +75,21 @@ fn main() {
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                 ctx.set_contents(html.clone()).expect("Failed to copy to clipboard");
                 println!("HTML copied to clipboard!");
-            } else if let Some(output_path) = output_file_path {
+            } 
+            
+            if let Some(output_path) = output_file_path {
                 if let Err(err) = save_html_to_file(&html, output_path) {
                     eprintln!("Error saving HTML to file: {}", err);
                 } else {
                     println!("Conversion successful. HTML saved to {}", output_path);
+                    if preview_in_browser {
+                        if webbrowser::open(output_path).is_err() {
+                            eprintln!("Failed to open the HTML in the default browser.");
+                        }
+                    }
                 }
-            } else {
-                eprintln!("Please specify an output file or use the --clipboard option.");
+            } else if !use_clipboard {
+                eprintln!("Please specify an output file or use the --clipboard or --browser option.");
             }
         },
         Err(err) => eprintln!("Error converting file to HTML: {}", err),
