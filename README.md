@@ -77,8 +77,7 @@ cargo run --release -- -i example.md -o output.html --theme dark
     ```
     
 *   **Tables**: Enable table formatting in your Markdown.
-    
-    
+
     
     ```console
     cargo run --release -- -i <input-file> -o <output-file> --tables
