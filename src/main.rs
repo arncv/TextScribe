@@ -6,6 +6,29 @@ use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
 use webbrowser;
 use base64;
+use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
+
+fn optimize_image(img_path: &Path) -> Result<Vec<u8>, image::ImageError> {
+    let img = image::open(img_path)?;
+    let mut optimized_img = Vec::new();
+
+    // Determine the image format
+    let format = ImageReader::open(img_path)?.format();
+
+    match format {
+        Some(ImageFormat::Png) => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
+        }
+        // Add other formats as needed
+        _ => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
+        }
+    }
+
+    Ok(optimized_img)
+}
+
+// This function is used to optimize the image
 
 fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
     let img_tag_pattern = "<img src=\"";
@@ -17,9 +40,16 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
         let img_path_str = &html_output[start + img_tag_pattern.len()..end];
         let img_path = base_path.join(img_path_str);
 
-        if let Ok(img_data) = fs::read(img_path) {
-            let encoded = base64::encode(&img_data);
-            let data_url = format!("data:image/png;base64,{}", encoded); // Assuming PNG, adjust accordingly
+        if let Ok(img_data) = fs::read(img_path.clone()) {
+            let optimized_data = match optimize_image(&img_path) {
+                Ok(data) => data,
+                Err(e) => {
+                    eprintln!("Warning: Failed to optimize image {}: {}", img_path.display(), e);
+                    img_data.clone()
+                }
+            };
+            let encoded = base64::encode(&optimized_data);
+            let data_url = format!("data:image/png;base64,{}", encoded); // Adjust format detection as needed
             html_output.replace_range(start + img_tag_pattern.len()..end, &data_url);
         }
 

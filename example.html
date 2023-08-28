@@ -1,0 +1,84 @@
+<h1>Markdown to HTML Converter</h1>
+<p>The Markdown to HTML Converter is a powerful command-line tool crafted in Rust, designed to seamlessly transform Markdown files into HTML. Built upon the robust <code>pulldown-cmark</code> crate, it ensures accurate parsing and rendering of Markdown content.</p>
+<h2>🌟 Features</h2>
+<ul>
+<li><strong>Swift Conversion</strong>: Quickly turn your Markdown files into HTML.</li>
+<li><strong>Intuitive CLI</strong>: A user-friendly command-line interface with comprehensive argument parsing.</li>
+<li><strong>Rich Markdown Support</strong>: Handles a wide range of Markdown syntax including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.</li>
+<li><strong>Customization Options</strong>: Enable specific Markdown features like tables and strikethrough.</li>
+<li><strong>Flexible Output</strong>: Directly save the generated HTML to your desired location, copy it directly to the clipboard, or preview it in your default web browser.</li>
+<li><strong>Theming</strong>: Choose from multiple themes to style your HTML output.</li>
+</ul>
+<h2>🚀 Installation</h2>
+<ol>
+<li>
+<p><strong>Setup Rust Environment</strong>: If Rust and Cargo aren't set up on your machine, get them from <a href="https://www.rust-lang.org/">Rust's official website</a>.</p>
+</li>
+<li>
+<p><strong>Clone the Repository</strong>:</p>
+<pre><code class="language-console">git clone https://github.com/arncv/MDtoHTM.git
+</code></pre>
+</li>
+<li>
+<p><strong>Enter the Project Directory</strong>:</p>
+<pre><code class="language-console">cd markdown-to-html-converter
+</code></pre>
+</li>
+<li>
+<p><strong>Compile the Project</strong>:</p>
+<pre><code class="language-console">cargo build --release
+</code></pre>
+</li>
+</ol>
+<h2>🛠 Usage</h2>
+<p>Convert your Markdown to HTML with this simple command:</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; [-o &lt;output-file&gt;] [--theme &lt;theme-name&gt;] [--clipboard] [--browser]
+</code></pre>
+<ul>
+<li><code>&lt;input-file&gt;</code>: Your Markdown file's path.</li>
+<li><code>&lt;output-file&gt;</code>: (Optional) Desired path for the HTML output. If not provided and neither the clipboard nor browser option is used, an error will be displayed.</li>
+<li><code>--theme &lt;theme-name&gt;</code>: Optional theme (choices: default, dark, light).</li>
+<li><code>--clipboard</code>: Copy the generated HTML directly to the clipboard.</li>
+<li><code>--browser</code>: Preview the generated HTML in your default web browser.</li>
+</ul>
+<p><strong>Example</strong>: Convert <code>example.md</code> to HTML using the dark theme and save as <code>output.html</code>:</p>
+<pre><code class="language-console">cargo run --release -- -i example.md -o output.html --theme dark
+</code></pre>
+<p>Or, to copy the output directly to the clipboard:</p>
+<pre><code class="language-console">cargo run --release -- -i example.md --clipboard
+</code></pre>
+<p>Or, to preview the output in your default web browser:</p>
+<pre><code class="language-console">cargo run --release -- -i example.md --browser
+</code></pre>
+<h2>🎨 Options</h2>
+<ul>
+<li>
+<p><strong>Theming</strong>: Apply a theme to your HTML output.</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; -o &lt;output-file&gt; --theme &lt;theme-name&gt;
+</code></pre>
+</li>
+<li>
+<p><strong>Tables</strong>: Enable table formatting in your Markdown.</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; -o &lt;output-file&gt; --tables
+</code></pre>
+</li>
+<li>
+<p><strong>Strikethrough</strong>: Activate strikethrough formatting.</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; -o &lt;output-file&gt; --strikethrough
+</code></pre>
+</li>
+<li>
+<p><strong>Clipboard Output</strong>: Directly copy the generated HTML to the clipboard.</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; --clipboard
+</code></pre>
+</li>
+<li>
+<p><strong>Browser Preview</strong>: Instantly preview the generated HTML in your default web browser.</p>
+<pre><code class="language-console">cargo run --release -- -i &lt;input-file&gt; --browser
+</code></pre>
+</li>
+</ul>
+<h2>🤝 Contributing</h2>
+<p>We value your contributions! Whether it's a feature request, bug fix, or a new idea, feel free to submit a pull request or open an issue. Let's make this tool even better, together!</p>
+<h2>📜 License</h2>
+<p>This project is licensed under the <a href="LICENSE">MIT License</a>.</p>
