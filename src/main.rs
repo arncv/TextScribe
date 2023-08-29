@@ -8,27 +8,45 @@ use webbrowser;
 use base64;
 use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
 
-fn optimize_image(img_path: &Path) -> Result<Vec<u8>, image::ImageError> {
+fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::ImageError> {
     let img = image::open(img_path)?;
     let mut optimized_img = Vec::new();
 
     // Determine the image format
-    let format = ImageReader::open(img_path)?.format();
+    let format = ImageReader::open(img_path)?.format().unwrap_or(ImageFormat::Png); // Default to PNG if format detection fails
 
     match format {
-        Some(ImageFormat::Png) => {
+        ImageFormat::Png => {
             img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
-        }
+        },
+        ImageFormat::Jpeg => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Jpeg(80))?; // 80 is the quality setting
+        },
+        ImageFormat::Gif => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Gif)?;
+        },
         // Add other formats as needed
         _ => {
             img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
         }
     }
+    
 
-    Ok(optimized_img)
+
+    Ok((optimized_img, format))
 }
 
 // This function is used to optimize the image
+
+fn get_data_url_prefix(format: ImageFormat) -> &'static str {
+    match format {
+        ImageFormat::Png => "data:image/png;base64,",
+        ImageFormat::Jpeg => "data:image/jpeg;base64,",
+        ImageFormat::Gif => "data:image/gif;base64,",
+        // Add other formats as needed
+        _ => "data:image/png;base64,", // default to PNG
+    }
+}
 
 fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
     let img_tag_pattern = "<img src=\"";
@@ -40,22 +58,25 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
         let img_path_str = &html_output[start + img_tag_pattern.len()..end];
         let img_path = base_path.join(img_path_str);
 
-        if let Ok(img_data) = fs::read(img_path.clone()) {
-            let optimized_data = match optimize_image(&img_path) {
-                Ok(data) => data,
+        if fs::read(img_path.clone()).is_ok() {
+            let (optimized_data, img_format) = match optimize_image(&img_path) {
+                Ok(result) => result,
                 Err(e) => {
                     eprintln!("Warning: Failed to optimize image {}: {}", img_path.display(), e);
-                    img_data.clone()
+                    (fs::read(img_path.clone()).unwrap(), ImageFormat::Png) // default to PNG if optimization fails
                 }
             };
+            
             let encoded = base64::encode(&optimized_data);
-            let data_url = format!("data:image/png;base64,{}", encoded); // Adjust format detection as needed
+            let prefix = get_data_url_prefix(img_format);
+            let data_url = format!("{}{}", prefix, encoded);
             html_output.replace_range(start + img_tag_pattern.len()..end, &data_url);
         }
 
         index = end;
     }
 }
+
 
 
 fn convert_markdown_to_html(input: &str) -> String {
