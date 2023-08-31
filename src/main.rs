@@ -7,6 +7,7 @@ use clipboard::ClipboardContext;
 use webbrowser;
 use base64;
 use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
+ 
 
 fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::ImageError> {
     let img = image::open(img_path)?;
@@ -30,11 +31,9 @@ fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::Imag
             img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
         }
     }
-    
-
-
     Ok((optimized_img, format))
 }
+
 
 // This function is used to optimize the image
 
@@ -47,6 +46,9 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
         _ => "data:image/png;base64,", // default to PNG
     }
 }
+
+// This function is used to get the prefix of the data url
+
 
 fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
     let img_tag_pattern = "<img src=\"";
@@ -76,8 +78,7 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
         index = end;
     }
 }
-
-
+// Embeds the image as base64 
 
 fn convert_markdown_to_html(input: &str) -> String {
     let options = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH;
@@ -86,6 +87,7 @@ fn convert_markdown_to_html(input: &str) -> String {
     html::push_html(&mut html_output, parser);
     html_output
 }
+// Main function
 
 fn convert_file_to_html(file_path: &str) -> Result<String, std::io::Error> {
     let markdown = fs::read_to_string(file_path)?;
