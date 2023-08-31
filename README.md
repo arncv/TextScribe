@@ -134,6 +134,7 @@ cargo run --release -- -i example.md --browser
 *   **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
 
 We're always open to suggestions and feedback. If you have an idea that's not listed here, please share it with us!
+
 🤝 Contributing
 ---------------
 
