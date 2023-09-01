@@ -12,4 +12,5 @@ clipboard = "0.5"
 webbrowser = "0.5"
 base64 = "0.13"
 image = "0.23"
+syntect = "4.6.0"
 

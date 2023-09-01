@@ -7,7 +7,33 @@ use clipboard::ClipboardContext;
 use webbrowser;
 use base64;
 use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
- 
+use syntect::parsing::SyntaxSet;
+use syntect::highlighting::{ThemeSet, Style};
+use syntect::html::highlighted_html_for_string;
+
+
+
+// Add this function to handle syntax highlighting
+fn apply_syntax_highlighting(html: &str) -> String {
+    let syntax_set = SyntaxSet::load_defaults_newlines();
+    let theme_set = ThemeSet::load_defaults();
+
+    let theme = &theme_set.themes["base16-ocean.dark"];
+    let mut highlighted_html = String::new();
+
+    for line in html.lines() {
+        if line.starts_with("<pre><code>") && line.ends_with("</code></pre>") {
+            let code = &line[11..line.len() - 12];
+            let syntax = syntax_set.find_syntax_by_extension("rs").unwrap();
+            let highlighted = highlighted_html_for_string(code, &syntax_set, syntax, theme);
+            highlighted_html.push_str(&format!("<pre><code>{}</code></pre>", highlighted));
+        } else {
+            highlighted_html.push_str(line);
+        }
+    }
+
+    highlighted_html
+}
 
 fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::ImageError> {
     let img = image::open(img_path)?;
@@ -150,6 +176,9 @@ fn main() {
             let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
             embed_images_as_base64(&mut html, base_path);
 
+            // Apply syntax highlighting
+            html = apply_syntax_highlighting(&html);
+            
             if use_clipboard {
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                 ctx.set_contents(html.clone()).expect("Failed to copy to clipboard");
