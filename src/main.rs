@@ -159,8 +159,14 @@ fn main() {
              .short("b")
              .long("browser")
              .takes_value(false))
+        .arg(Arg::with_name("verbose")
+         .help("Enable verbose output")
+         .short("v")
+         .long("verbose")
+         .takes_value(false))
         .get_matches();
 
+    let verbose_mode = matches.is_present("verbose");
     let input_file_path = matches.value_of("input").expect("Failed to get input file path");
     let output_file_path = matches.value_of("output");
     let theme = matches.value_of("theme").expect("Failed to get theme");
@@ -172,6 +178,10 @@ fn main() {
     match convert_file_to_html(input_file_path) {
         Ok(mut html) => {
             html.insert_str(0, css); // Prepend the CSS to the HTML output
+            if verbose_mode {
+                println!("Markdown file converted to HTML.");
+            }
+
             
             let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
             embed_images_as_base64(&mut html, base_path);
@@ -182,7 +192,9 @@ fn main() {
             if use_clipboard {
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
                 ctx.set_contents(html.clone()).expect("Failed to copy to clipboard");
-                println!("HTML copied to clipboard!");
+                if verbose_mode {
+                    println!("HTML copied to clipboard!");
+                }
             } 
             
             if let Some(output_path) = output_file_path {
@@ -200,6 +212,12 @@ fn main() {
                 eprintln!("Please specify an output file or use the --clipboard or --browser option.");
             }
         },
-        Err(err) => eprintln!("Error converting file to HTML: {}", err),
+        Err(err) => {
+            eprintln!("Error converting file to HTML: {}", err);
+
+            if verbose_mode {
+                eprintln!("Verbose: Conversion failed.");
+            }
+        }
     }
 }
