@@ -133,6 +133,7 @@ fn get_theme_css(theme: &str) -> &str {
 }
 
 fn main() {
+    env_logger::init();
     let matches = App::new("Rust Markdown Converter")
         .version("1.0")
         .author("Your Name")
@@ -179,8 +180,9 @@ fn main() {
         Ok(mut html) => {
             html.insert_str(0, css); // Prepend the CSS to the HTML output
             if verbose_mode {
-                println!("Markdown file converted to HTML.");
+                log::info!("Markdown file converted to HTML.");
             }
+            
 
             
             let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
@@ -216,8 +218,9 @@ fn main() {
             eprintln!("Error converting file to HTML: {}", err);
 
             if verbose_mode {
-                eprintln!("Verbose: Conversion failed.");
+                eprintln!("Verbose: Conversion failed due to: {:?}", err.kind());
             }
         }
     }
 }
+
