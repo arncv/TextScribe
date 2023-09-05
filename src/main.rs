@@ -8,7 +8,7 @@ use webbrowser;
 use base64;
 use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
 use syntect::parsing::SyntaxSet;
-use syntect::highlighting::{ThemeSet, Style};
+use syntect::highlighting::{ThemeSet};
 use syntect::html::highlighted_html_for_string;
 
 
@@ -160,6 +160,10 @@ fn main() {
              .short("b")
              .long("browser")
              .takes_value(false))
+        .arg(Arg::with_name("css")
+             .help("Path to an external CSS file to include in the output HTML")
+             .takes_value(true)
+             .long("css"))
         .arg(Arg::with_name("verbose")
          .help("Enable verbose output")
          .short("v")
@@ -173,12 +177,24 @@ fn main() {
     let theme = matches.value_of("theme").expect("Failed to get theme");
     let use_clipboard = matches.is_present("clipboard");
     let preview_in_browser = matches.is_present("browser");
+    let css_file_path = matches.value_of("css");
 
-    let css = get_theme_css(theme);
+    let css = if let Some(path) = css_file_path {
+        match fs::read_to_string(path) {
+            Ok(contents) => contents,
+            Err(err) => {
+                eprintln!("Warning: Failed to read CSS file {}: {}", path, err);
+                get_theme_css(theme).to_string()
+            }
+        }
+    } else {
+        get_theme_css(theme).to_string()
+    };
+    
 
     match convert_file_to_html(input_file_path) {
         Ok(mut html) => {
-            html.insert_str(0, css); // Prepend the CSS to the HTML output
+            html.insert_str(0, &css); // Prepend the CSS to the HTML output
             if verbose_mode {
                 log::info!("Markdown file converted to HTML.");
             }
