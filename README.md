@@ -128,7 +128,7 @@ cargo run --release -- -i example.md --browser
 -----------------
 
 *   ✅**Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
-*   **PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
+*   ✅**PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
 *   **Extended Theming**: Introduce more themes and customization options for the HTML output.
 *   **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
 *   **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
