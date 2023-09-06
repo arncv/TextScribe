@@ -10,6 +10,7 @@ use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
 use syntect::parsing::SyntaxSet;
 use syntect::highlighting::{ThemeSet};
 use syntect::html::highlighted_html_for_string;
+use std::process::Command;
 
 
 
@@ -155,6 +156,11 @@ fn main() {
              .short("c")
              .long("clipboard")
              .takes_value(false))
+        .arg(Arg::with_name("pdf")
+             .help("Export the generated HTML to a PDF file")
+             .short("p")
+             .long("pdf")
+             .takes_value(false))
         .arg(Arg::with_name("browser")
              .help("Preview the generated HTML in the default web browser")
              .short("b")
@@ -179,6 +185,9 @@ fn main() {
     let preview_in_browser = matches.is_present("browser");
     let css_file_path = matches.value_of("css");
 
+    let export_to_pdf = matches.is_present("pdf");
+    let output_pdf_path = "output.pdf";
+    
     let css = if let Some(path) = css_file_path {
         match fs::read_to_string(path) {
             Ok(contents) => contents,
@@ -214,7 +223,23 @@ fn main() {
                     println!("HTML copied to clipboard!");
                 }
             } 
-            
+
+            if export_to_pdf {
+                let output = Command::new("wkhtmltopdf")
+                    .arg("example.html") // Replace with your actual HTML input file
+                    .arg(output_pdf_path)
+                    .output()
+                    .expect("Failed to execute wkhtmltopdf");
+        
+                if output.status.success() {
+                    println!("Successfully exported to PDF: {}", output_pdf_path);
+                } else {
+                    eprintln!("Failed to export to PDF");
+                    eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+                    eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+                }
+            }
+
             if let Some(output_path) = output_file_path {
                 if let Err(err) = save_html_to_file(&html, output_path) {
                     eprintln!("Error saving HTML to file: {}", err);
