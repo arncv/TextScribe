@@ -117,6 +117,10 @@ fn convert_markdown_to_html(input: &str) -> String {
 // Main function
 
 fn convert_file_to_html(file_path: &str) -> Result<String, std::io::Error> {
+    if !Path::new(file_path).exists() {
+        return Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Input file not found"));
+    }
+
     let markdown = fs::read_to_string(file_path)?;
     Ok(convert_markdown_to_html(&markdown))
 }
@@ -170,6 +174,11 @@ fn main() {
              .help("Path to an external CSS file to include in the output HTML")
              .takes_value(true)
              .long("css"))
+        .arg(Arg::with_name("pdf_name")
+             .help("Specify the output PDF file name")
+             .takes_value(true)
+             .short("n")
+             .long("pdf-name"))
         .arg(Arg::with_name("verbose")
          .help("Enable verbose output")
          .short("v")
@@ -179,7 +188,7 @@ fn main() {
 
     let verbose_mode = matches.is_present("verbose");
     let input_file_path = matches.value_of("input").expect("Failed to get input file path");
-    let output_file_path = matches.value_of("output");
+    let output_pdf_path = matches.value_of("pdf_name").unwrap_or("output.pdf");
     let theme = matches.value_of("theme").expect("Failed to get theme");
     let use_clipboard = matches.is_present("clipboard");
     let preview_in_browser = matches.is_present("browser");
@@ -226,7 +235,7 @@ fn main() {
 
             if export_to_pdf {
                 let output = Command::new("wkhtmltopdf")
-                    .arg("example.html") // Replace with your actual HTML input file
+                    .arg("example.html") 
                     .arg(output_pdf_path)
                     .output()
                     .expect("Failed to execute wkhtmltopdf");
