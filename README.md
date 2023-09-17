@@ -1,5 +1,6 @@
-Markdown to HTML Converter
+TextScribe - Markdown to HTML Converter
 ==========================
+![logo](https://i.imgur.com/FU0mh9C.png)
 
 The Markdown to HTML Converter is a robust command-line utility built with Rust. It's designed to transform Markdown files into HTML format effortlessly. With the power of the `pulldown-cmark` crate, it ensures accurate parsing and rendering of Markdown content.
 
