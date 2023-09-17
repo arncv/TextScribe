@@ -1,68 +1,60 @@
 TextScribe - Markdown Converter
 ==========================
+
 ![logo](https://i.imgur.com/FU0mh9C.png)
 
-The Markdown  Converter is a robust command-line utility built with Rust. It's designed to transform Markdown files into HTML & PDF format effortlessly. With the power of the `pulldown-cmark` crate, it ensures accurate parsing and rendering of Markdown content.
+
+The Markdown Converter is a robust command-line utility built with Rust. It's designed to transform Markdown files into HTML, EPUB & PDF format effortlessly. With the power of the 'pulldown-cmark' crate, it ensures accurate parsing and rendering of Markdown content.
 
 🌟 Features
 -----------
 
-*   **Swift Conversion**: Instantly convert your Markdown files into HTML, PDF & EPUB.
-*   **Intuitive CLI**: A user-friendly command-line interface powered by the `clap` crate.
-*   **Rich Markdown Support**: Supports a wide range of Markdown syntax, including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.
-*   **Customization Options**: Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
-*   **Flexible Output**: Save the generated HTML or EPUB to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
-*   **Theming**: Style your HTML output with different themes.
+* **Swift Conversion**: Instantly convert your Markdown files into HTML, PDF & EPUB.
+* **Intuitive CLI**: A user-friendly command-line interface powered by the `clap` crate.
+* **Rich Markdown Support**: Supports a wide range of Markdown syntax, including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.
+* **Customization Options**: Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
+* **Flexible Output**: Save the generated HTML or EPUB to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
+* **Theming**: Style your HTML output with different themes.
 
 🚀 Installation
 ---------------
 
-1.  **Setup Rust Environment**: If you haven't installed Rust and Cargo, get them from [Rust's official website](https://www.rust-lang.org/).
-2.  **Clone the Repository**:
-    
+1. **Setup Rust Environment**: If you haven't installed Rust and Cargo, get them from [Rust's official website](https://www.rust-lang.org/).
+2. **Clone the Repository**:
 
     ```console
     git clone https://github.com/arncv/TextScribe.git
     ```
-    
-3.  **Navigate to the Project Directory**:
-    
 
-    
+3. **Navigate to the Project Directory**:
+
     ```console
     cd TextScribe
     ```
-    
-4.  **Compile the Project**:
-    
 
-    
+4. **Compile the Project**:
+
     ```console
     cargo build --release
     ```
-    
 
 🛠 Usage
 --------
 
 To convert your Markdown to HTML or EPUB, use the following command:
 
-
-
 ```console
 cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>] [--clipboard] [--browser] [--epub]
 ```
 
-*   `<input-file>`: Path to your Markdown file.
-*   `<output-file>`: (Optional) Path for the HTML output. If not provided and neither clipboard nor browser options are used, an error will be prompted.
-*   `--theme <theme-name>`: Choose a theme (options: default, dark, light).
-*   `--clipboard`: Copy the generated HTML directly to the clipboard.
-*   `--browser`: Preview the generated HTML in your default web browser.
-*   `--epub`: Generate an EPUB file. Perfect for readers.
+* `<input-file>`: Path to your Markdown file.
+* `<output-file>`: (Optional) Path for the HTML output. If not provided and neither clipboard nor browser options are used, an error will be prompted.
+* `--theme <theme-name>`: Choose a theme (options: default, dark, light).
+* `--clipboard`: Copy the generated HTML directly to the clipboard.
+* `--browser`: Preview the generated HTML in your default web browser.
+* `--epub`: Generate an EPUB file. Perfect for readers.
 
 **Example**: Convert `example.md` to HTML using the dark theme and save it as `output.html`:
-
-
 
 ```console
 cargo run --release -- -i example.md -o output.html --theme dark
@@ -70,71 +62,64 @@ cargo run --release -- -i example.md -o output.html --theme dark
 
 To copy the output directly to the clipboard:
 
-
-
 ```console
 cargo run --release -- -i example.md --clipboard
 ```
 
 To preview the output in your default web browser:
 
-
-
 ```console
 cargo run --release -- -i example.md --browser
+```
+
+Convert `example.md` to EPUB using the dark theme and save it as `output.epub`:
+
+```console
+cargo run --release -- -i example.md -o output.epub --theme dark --epub
 ```
 
 🎨 Options
 ----------
 
-*   **Theming**: Style your HTML output.
-    
+* **Theming**: Style your HTML output.
 
-    
     ```console
     cargo run --release -- -i <input-file> -o <output-file> --theme <theme-name>
     ```
-    
-*   **Tables**: Enable table formatting in your Markdown.
-    
 
-    
+* **Tables**: Enable table formatting in your Markdown.
+
     ```console
     cargo run --release -- -i <input-file> -o <output-file> --tables
     ```
-    
-*   **Strikethrough**: Enable strikethrough formatting.
-    
 
-    
+* **Strikethrough**: Enable strikethrough formatting.
+
     ```console
     cargo run --release -- -i <input-file> -o <output-file> --strikethrough
     ```
-    
-*   **Clipboard Output**: Copy the generated HTML to the clipboard.
-    
+
+* **Clipboard Output**: Copy the generated HTML to the clipboard.
+
     ```console
     cargo run --release -- -i <input-file> --clipboard
     ```
-    
-*   **Browser Preview**: View the generated HTML in your default web browser.
 
-    
+* **Browser Preview**: View the generated HTML in your default web browser.
+
     ```console
     cargo run --release -- -i <input-file> --browser
     ```
-    
-
 
 🚧 Future Roadmap
 -----------------
 
-*   ✅**Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
-*   ✅**Improved Error Handling**:  Improved functionality & logging for errors.
-*   ✅**PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
-*   **Extended Theming**: Introduce more themes and customization options for the HTML output.
-*   **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
-*   **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
+* ✅**Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
+* ✅**Improved Error Handling**:  Improved functionality & logging for errors.
+* ✅**PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
+* **Extended Theming**: Introduce more themes and customization options for the HTML output.
+* **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
+* **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
 
 We're always open to suggestions and feedback. If you have an idea that's not listed here, please share it with us!
 
