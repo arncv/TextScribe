@@ -94,14 +94,13 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
 
 // This function is used to get the prefix of the data url
 
-
 fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
     let img_tag_pattern = "<img src=\"";
     let mut index = 0;
 
     while let Some(start) = html_output[index..].find(img_tag_pattern) {
         let start = start + index;
-        let end = html_output[start..].find("\"").unwrap() + start;
+        let end = html_output[start..].find("\"").unwrap() + start + img_tag_pattern.len();
         let img_path_str = &html_output[start + img_tag_pattern.len()..end];
         let img_path = base_path.join(img_path_str);
 
@@ -120,7 +119,7 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
             html_output.replace_range((start + img_tag_pattern.len())..end, &data_url);
         }
 
-        index = end;
+        index = end + 1;
     }
 }
 
