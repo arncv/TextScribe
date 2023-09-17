@@ -11,6 +11,10 @@ use syntect::parsing::SyntaxSet;
 use syntect::highlighting::{ThemeSet};
 use syntect::html::highlighted_html_for_string;
 use std::process::Command;
+use epub_builder::EpubBuilder;
+use epub_builder::EpubContent;
+use epub_builder::ZipLibrary;
+use epub_builder::Result as EpubResult;
 
 
 
@@ -60,6 +64,20 @@ fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::Imag
     }
     Ok((optimized_img, format))
 }
+fn convert_to_epub(html: &str, output_file_path: &str) -> EpubResult<()> {
+    let mut epub = EpubBuilder::new(ZipLibrary::new()?)?;
+
+    epub.metadata("author", "Your Name")?;
+    epub.metadata("title", "Your Title")?;
+
+    epub.add_content(EpubContent::new("chapter1.html", html.as_bytes())
+        .title("Chapter 1"))?;
+
+    epub.generate(&mut std::fs::File::create(output_file_path)?)?;
+
+    Ok(())
+}
+
 
 
 // This function is used to optimize the image
@@ -99,12 +117,13 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
             let encoded = base64::encode(&optimized_data);
             let prefix = get_data_url_prefix(img_format);
             let data_url = format!("{}{}", prefix, encoded);
-            html_output.replace_range(start + img_tag_pattern.len()..end, &data_url);
+            html_output.replace_range((start + img_tag_pattern.len())..end, &data_url);
         }
 
         index = end;
     }
 }
+
 // Embeds the image as base64 
 
 fn convert_markdown_to_html(input: &str) -> String {
@@ -179,6 +198,11 @@ fn main() {
              .takes_value(true)
              .short("n")
              .long("pdf-name"))
+        .arg(Arg::with_name("epub")
+             .help("Export the generated HTML to an EPUB file")
+             .short("e")
+             .long("epub")
+             .takes_value(false))
         .arg(Arg::with_name("verbose")
          .help("Enable verbose output")
          .short("v")
@@ -193,10 +217,9 @@ fn main() {
     let use_clipboard = matches.is_present("clipboard");
     let preview_in_browser = matches.is_present("browser");
     let css_file_path = matches.value_of("css");
+    let output_file_path = matches.value_of("output");
 
-    let export_to_pdf = matches.is_present("pdf");
-    let output_pdf_path = "output.pdf";
-    
+    let export_to_pdf = matches.is_present("pdf");    
     let css = if let Some(path) = css_file_path {
         match fs::read_to_string(path) {
             Ok(contents) => contents,
@@ -231,7 +254,16 @@ fn main() {
                 if verbose_mode {
                     println!("HTML copied to clipboard!");
                 }
-            } 
+            }
+            if matches.is_present("epub") {
+                let output_epub_path = "output.epub";
+                match convert_to_epub(&html, output_epub_path) {
+                    Ok(_) => println!("Successfully exported to EPUB: {}", output_epub_path),
+                    Err(err) => eprintln!("Failed to export to EPUB: {}", err),
+                }
+            }
+            
+            
 
             if export_to_pdf {
                 let output = Command::new("wkhtmltopdf")

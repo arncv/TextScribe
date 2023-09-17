@@ -6,11 +6,11 @@ The Markdown to HTML Converter is a robust command-line utility built with Rust.
 🌟 Features
 -----------
 
-*   **Swift Conversion**: Instantly convert your Markdown files into HTML.
+*   **Swift Conversion**: Instantly convert your Markdown files into HTML, PDF & EPUB.
 *   **Intuitive CLI**: A user-friendly command-line interface powered by the `clap` crate.
 *   **Rich Markdown Support**: Supports a wide range of Markdown syntax, including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.
 *   **Customization Options**: Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
-*   **Flexible Output**: Save the generated HTML to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
+*   **Flexible Output**: Save the generated HTML or EPUB to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
 *   **Theming**: Style your HTML output with different themes.
 
 🚀 Installation
@@ -21,7 +21,7 @@ The Markdown to HTML Converter is a robust command-line utility built with Rust.
     
 
     ```console
-    git clone https://github.com/arncv/MDtoHTM.git
+    git clone https://github.com/arncv/TextScribe.git
     ```
     
 3.  **Navigate to the Project Directory**:
@@ -29,7 +29,7 @@ The Markdown to HTML Converter is a robust command-line utility built with Rust.
 
     
     ```console
-    cd markdown-to-html-converter
+    cd TextScribe
     ```
     
 4.  **Compile the Project**:
@@ -44,12 +44,12 @@ The Markdown to HTML Converter is a robust command-line utility built with Rust.
 🛠 Usage
 --------
 
-To convert your Markdown to HTML, use the following command:
+To convert your Markdown to HTML or EPUB, use the following command:
 
 
 
 ```console
-cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>] [--clipboard] [--browser]
+cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>] [--clipboard] [--browser] [--epub]
 ```
 
 *   `<input-file>`: Path to your Markdown file.
@@ -57,6 +57,7 @@ cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>]
 *   `--theme <theme-name>`: Choose a theme (options: default, dark, light).
 *   `--clipboard`: Copy the generated HTML directly to the clipboard.
 *   `--browser`: Preview the generated HTML in your default web browser.
+*   `--epub`: Generate an EPUB file. Perfect for readers.
 
 **Example**: Convert `example.md` to HTML using the dark theme and save it as `output.html`:
 
