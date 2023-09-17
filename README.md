@@ -1,4 +1,4 @@
-TextScribe - Markdown to HTML Converter
+TextScribe - Markdown Converter
 ==========================
 ![logo](https://i.imgur.com/FU0mh9C.png)
 
