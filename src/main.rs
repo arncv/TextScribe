@@ -15,7 +15,7 @@ use epub_builder::EpubBuilder;
 use epub_builder::EpubContent;
 use epub_builder::ZipLibrary;
 use epub_builder::Result as EpubResult;
-
+use std::time::{Instant};
 
 
 // Add this function to handle syntax highlighting
@@ -156,6 +156,8 @@ fn get_theme_css(theme: &str) -> &str {
 }
 
 fn main() {
+    let start_time = Instant::now();
+
     env_logger::init();
     let matches = App::new("Rust Markdown Converter")
         .version("1.0")
@@ -303,5 +305,9 @@ fn main() {
             }
         }
     }
+
+    let duration = start_time.elapsed();
+
+    println!("Time elapsed in expensive_function() is: {:?}", duration);
 }
 
