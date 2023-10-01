@@ -151,6 +151,14 @@ fn get_theme_css(theme: &str) -> &str {
     match theme {
         "dark" => "<style>body { background-color: black; color: white; }</style>",
         "light" => "<style>body { background-color: white; color: black; }</style>",
+        "solarized_dark" => "<style>body { background-color: #002b36; color: #839496; }</style>",
+        "solarized_light" => "<style>body { background-color: #fdf6e3; color: #657b83; }</style>",
+        "gruvbox_dark" => "<style>body { background-color: #282828; color: #ebdbb2; }</style>",
+        "gruvbox_light" => "<style>body { background-color: #fbf1c7; color: #3c3836; }</style>",
+        "dracula" => "<style>body { background-color: #282a36; color: #f8f8f2; }</style>",
+        "monokai" => "<style>body { background-color: #272822; color: #f8f8f2; }</style>",
+        "nord" => "<style>body { background-color: #2e3440; color: #d8dee9; }</style>",
+        "zenburn" => "<style>body { background-color: #3f3f3f; color: #dcdccc; }</style>",
         _ => "", // default theme
     }
 }
@@ -172,7 +180,7 @@ fn main() {
              .required(false)
              .index(2))
         .arg(Arg::with_name("theme")
-             .help("CSS theme for the output. Available: default, dark, light")
+             .help("CSS theme for the output. Available: default, dark, light, solarized_dark, solarized_light, gruvbox_dark, gruvbox_light")
              .takes_value(true)
              .default_value("default"))
         .arg(Arg::with_name("clipboard")
