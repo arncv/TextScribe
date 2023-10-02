@@ -1,3 +1,4 @@
+// Import necessary Rust libraries and external crates.
 use std::fs;
 use std::path::Path;
 use pulldown_cmark::{html, Options, Parser};
@@ -20,12 +21,14 @@ use std::time::{Instant};
 
 // Add this function to handle syntax highlighting
 fn apply_syntax_highlighting(html: &str) -> String {
+     // Load default syntax set and themes for syntax highlighting.
     let syntax_set = SyntaxSet::load_defaults_newlines();
     let theme_set = ThemeSet::load_defaults();
 
     let theme = &theme_set.themes["base16-ocean.dark"];
     let mut highlighted_html = String::new();
 
+    // Iterate through lines of HTML and apply syntax highlighting to code blocks.
     for line in html.lines() {
         if line.starts_with("<pre><code>") && line.ends_with("</code></pre>") {
             let code = &line[11..line.len() - 12];
@@ -40,6 +43,7 @@ fn apply_syntax_highlighting(html: &str) -> String {
     highlighted_html
 }
 
+// Function to optimize image.
 fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::ImageError> {
     let img = image::open(img_path)?;
     let mut optimized_img = Vec::new();
@@ -47,6 +51,7 @@ fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::Imag
     // Determine the image format
     let format = ImageReader::open(img_path)?.format().unwrap_or(ImageFormat::Png); // Default to PNG if format detection fails
 
+    // Choose the appropriate image format and write the optimized image data to a vector.
     match format {
         ImageFormat::Png => {
             img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
@@ -64,23 +69,26 @@ fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::Imag
     }
     Ok((optimized_img, format))
 }
+
+
+// Function to convert HTML to EPUB.
 fn convert_to_epub(html: &str, output_file_path: &str) -> EpubResult<()> {
     let mut epub = EpubBuilder::new(ZipLibrary::new()?)?;
 
+    // Set metadata for the EPUB.
     epub.metadata("author", "Your Name")?;
     epub.metadata("title", "Your Title")?;
 
     epub.add_content(EpubContent::new("chapter1.html", html.as_bytes())
         .title("Chapter 1"))?;
 
+    // Generate the EPUB and save it to the specified file.
     epub.generate(&mut std::fs::File::create(output_file_path)?)?;
 
     Ok(())
 }
 
-
-
-// This function is used to optimize the image
+// Function to get the URL prefix based on image format.
 
 fn get_data_url_prefix(format: ImageFormat) -> &'static str {
     match format {
@@ -92,7 +100,7 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
     }
 }
 
-// This function is used to get the prefix of the data url
+// Function to embed images in HTML as base64.
 
 fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
     let img_tag_pattern = "<img src=\"";
@@ -122,9 +130,8 @@ fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
         index = end + 1;
     }
 }
-
-// Embeds the image as base64 
-
+	
+// Function to convert Markdown to HTML.
 fn convert_markdown_to_html(input: &str) -> String {
     let options = Options::ENABLE_TABLES | Options::ENABLE_STRIKETHROUGH;
     let parser = Parser::new_ext(input, options);
@@ -132,7 +139,7 @@ fn convert_markdown_to_html(input: &str) -> String {
     html::push_html(&mut html_output, parser);
     html_output
 }
-// Main function
+
 
 fn convert_file_to_html(file_path: &str) -> Result<String, std::io::Error> {
     if !Path::new(file_path).exists() {
@@ -143,10 +150,12 @@ fn convert_file_to_html(file_path: &str) -> Result<String, std::io::Error> {
     Ok(convert_markdown_to_html(&markdown))
 }
 
+// Function to save HTML file.
 fn save_html_to_file(html: &str, output_file_path: &str) -> Result<(), std::io::Error> {
     fs::write(output_file_path, html)
 }
 
+// Function to get CSS styles based on the selected theme.
 fn get_theme_css(theme: &str) -> &str {
     match theme {
         "dark" => "<style>body { background-color: black; color: white; }</style>",
@@ -163,9 +172,11 @@ fn get_theme_css(theme: &str) -> &str {
     }
 }
 
+// Main function
 fn main() {
     let start_time = Instant::now();
 
+    
     env_logger::init();
     let matches = App::new("Rust Markdown Converter")
         .version("1.0")
