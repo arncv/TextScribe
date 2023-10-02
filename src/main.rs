@@ -57,6 +57,15 @@ fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::Imag
         ImageFormat::Gif => {
             img.write_to(&mut optimized_img, ImageOutputFormat::Gif)?;
         },
+        ImageFormat::Bmp => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Bmp)?;
+        },
+        ImageFormat::Farbfeld => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Farbfeld)?;
+        },
+        ImageFormat::Ico => {
+            img.write_to(&mut optimized_img, ImageOutputFormat::Ico)?;
+        },
         // Add other formats as needed
         _ => {
             img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
@@ -87,6 +96,9 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
         ImageFormat::Png => "data:image/png;base64,",
         ImageFormat::Jpeg => "data:image/jpeg;base64,",
         ImageFormat::Gif => "data:image/gif;base64,",
+        ImageFormat::Bmp => "data:image/bmp;base64,",
+        ImageFormat::Farbfeld => "data:image/ff;base64,",
+        ImageFormat::Ico => "data:image/ico;base64",
         // Add other formats as needed
         _ => "data:image/png;base64,", // default to PNG
     }
