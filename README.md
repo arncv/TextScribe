@@ -5,14 +5,30 @@ TextScribe - Markdown Converter
 
 The Markdown Converter is a robust command-line utility built with Rust. It's designed to transform Markdown files into HTML, EPUB & PDF format effortlessly. With the power of the 'pulldown-cmark' crate, it ensures accurate parsing and rendering of Markdown content.
 
+## Table of Contents
+
+- [🌟 Features](#🌟-features)
+- [🚀 Installation](#🚀-installation)
+- [🛠 Usage](#🛠-usage)
+    - [Example](example)
+- [🎨 Options](#🎨-options)
+- [🚧 Future Roadmap](#🚧-future-roadmap)
+- [🤝 Contributing](#🤝-contributing)
+- [📜 License](#📜-license)
+
 🌟 Features
 -----------
 
 * **Swift Conversion**: Instantly convert your Markdown files into HTML, PDF & EPUB.
-* **Intuitive CLI**: A user-friendly command-line interface powered by the `clap` crate.
+
+* **Intuitive Interface**: A user-friendly command-line interface powered by the `clap` crate.
+
 * **Rich Markdown Support**: Supports a wide range of Markdown syntax, including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.
-* **Customization Options**: Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
+
+* [**Customization Options**](#🎨-options): Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
+
 * **Flexible Output**: Save the generated HTML or EPUB to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
+
 * **Theming**: Style your HTML output with different themes.
 
 🚀 Installation
@@ -53,7 +69,9 @@ cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>]
 * `--browser`: Preview the generated HTML in your default web browser.
 * `--epub`: Generate an EPUB file. Perfect for readers.
 
-**Example**: Convert `example.md` to HTML using the dark theme and save it as `output.html`:
+### **Example:**
+
+Convert `example.md` to HTML using the dark theme and save it as `output.html`:
 
 ```console
 cargo run --release -- -i example.md -o output.html --theme dark
@@ -113,12 +131,12 @@ cargo run --release -- -i example.md -o output.epub --theme dark --epub
 🚧 Future Roadmap
 -----------------
 
-* ✅**Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
-* ✅**Improved Error Handling**:  Improved functionality & logging for errors.
-* ✅**PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
-* **Extended Theming**: Introduce more themes and customization options for the HTML output.
-* **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
-* **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
+* ✅ **Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
+* ✅ **Improved Error Handling**:  Improved functionality & logging for errors.
+* ✅ **PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
+* - [ ] **Extended Theming**: Introduce more themes and customization options for the HTML output.
+* - [ ] **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
+* - [ ] **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
 
 We're always open to suggestions and feedback. If you have an idea that's not listed here, please share it with us!
 
@@ -126,6 +144,7 @@ We're always open to suggestions and feedback. If you have an idea that's not li
 ---------------
 
 Contributions are always welcome! Whether it's a feature request, bug fix, or a new idea, feel free to submit a pull request or open an issue. Let's enhance this tool together!
+Be sure to read [CONTRIBUTING](CONTRIBUTING.md) file to know about more contributions details.
 
 📜 License
 ----------
