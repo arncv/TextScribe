@@ -31,7 +31,7 @@ Before you start contributing, please read and adhere to our [Code of Conduct](C
 2. Clone your forked repository to your local machine.
 3. Create a new branch for your work with a proper well defined name.
 4. Make your changes and commit them with meaningful commit messages.
-5. Open [PRs](https://github.com/euanwm/OpenWeightlifting/pulls) to development branch (Remember to [Squash](https://docs.github.com/en/desktop/managing-commits/squashing-commits-in-github-desktop) before making a pr).
+5. Open [PRs](https://github.com/arncv/TextScribe/pulls) to development branch (Remember to [Squash](https://docs.github.com/en/desktop/managing-commits/squashing-commits-in-github-desktop) before making a pr).
 6. If the PR is in relation to an issue/feature then it must be referenced within the PR.
 
 ## Contributing Guidelines
