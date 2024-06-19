@@ -29,7 +29,8 @@ pub fn copy_to_clipboard(html: &str) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn export_html_to_pdf(html: &str, output_pdf_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn export_html_to_pdf(_html: &str, output_pdf_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let _ = _html;
     let output = Command::new("wkhtmltopdf")
         .arg("example.html") 
         .arg(output_pdf_path)

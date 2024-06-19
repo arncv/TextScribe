@@ -6,9 +6,9 @@ mod cli;
 mod epub;
 mod utils;
 
-use clap::{App, Arg};
-use std::path::Path;
+
 use std::time::Instant;
+use std::path::Path;
 
 fn main() {
     let start_time = Instant::now();
