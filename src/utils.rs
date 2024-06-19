@@ -15,6 +15,7 @@ pub fn get_theme_css(theme: &str) -> &str {
         "monokai" => "<style>body { background-color: #272822; color: #f8f8f2; }</style>",
         "nord" => "<style>body { background-color: #2e3440; color: #d8dee9; }</style>",
         "zenburn" => "<style>body { background-color: #3f3f3f; color: #dcdccc; }</style>",
+        "pookie" => "<style>body { background-color: pink; color: white; }</style>",
         _ => "", // default theme
     }
 }
