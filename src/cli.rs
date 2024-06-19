@@ -3,8 +3,8 @@ use clap::{App, Arg};
 
 pub fn parse_args() -> clap::ArgMatches<'static> {
     App::new("Rust Markdown Converter")
-        .version("1.0")
-        .author("Your Name")
+        .version("1.4")
+        .author("Arnav")
         .about("Converts Markdown to HTML")
         .arg(Arg::with_name("input")
              .help("Input markdown file")
