@@ -47,7 +47,7 @@ fn run(matches: clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     html.insert_str(0, &css); // Prepend the CSS to the HTML output
 
     let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
-    image::embed_images_as_base64(&mut html, base_path);
+    image::embed_images_as_base64(&mut html, base_path, Some(85));
 
     // Apply syntax highlighting
     html = highlighting::apply_syntax_highlighting(&html);

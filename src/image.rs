@@ -1,44 +1,54 @@
-// src/image.rs
+use std::sync::{Arc, Mutex};
 use std::fs;
 use std::path::Path;
 use base64;
 use image::{ImageOutputFormat, ImageFormat, io::Reader as ImageReader};
+use anyhow::{Result, Context};
+use log::{info, warn};
+use rayon::prelude::*;
 
-pub fn optimize_image(img_path: &Path) -> Result<(Vec<u8>, ImageFormat), image::ImageError> {
-    let img = image::open(img_path)?;
+pub fn optimize_image(img_path: &Path, quality: Option<u8>) -> Result<(Vec<u8>, ImageFormat)> {
+    let img = image::open(img_path).context("Failed to open image")?;
     let mut optimized_img = Vec::new();
 
     let format = ImageReader::open(img_path)?.format().unwrap_or(ImageFormat::Png); // Default to PNG if format detection fails
 
     match format {
         ImageFormat::Png => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Png).context("Failed to write PNG image")?;
         },
         ImageFormat::Jpeg => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Jpeg(80))?; // 80 is the quality setting
+            let quality = quality.unwrap_or(80); // Default to quality 80 if not specified
+            img.write_to(&mut optimized_img, ImageOutputFormat::Jpeg(quality)).context("Failed to write JPEG image")?;
         },
         ImageFormat::Gif => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Gif)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Gif).context("Failed to write GIF image")?;
         },
         ImageFormat::Bmp => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Bmp)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Bmp).context("Failed to write BMP image")?;
         },
         ImageFormat::Farbfeld => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Farbfeld)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Farbfeld).context("Failed to write Farbfeld image")?;
         },
         ImageFormat::Ico => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Ico)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Ico).context("Failed to write ICO image")?;
         },
         _ => {
-            img.write_to(&mut optimized_img, ImageOutputFormat::Png)?;
+            img.write_to(&mut optimized_img, ImageOutputFormat::Png).context("Failed to write default PNG image")?;
         }
     }
     Ok((optimized_img, format))
 }
 
-pub fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
+pub fn embed_images_as_base64(
+    html_output: &mut String,
+    base_path: &Path,
+    quality: Option<u8>,
+) {
     let img_tag_pattern = "<img src=\"";
     let mut index = 0;
+
+    let mut tasks: Vec<_> = Vec::new();
 
     while let Some(start) = html_output[index..].find(img_tag_pattern) {
         let start = start + index;
@@ -47,22 +57,33 @@ pub fn embed_images_as_base64(html_output: &mut String, base_path: &Path) {
         let img_path = base_path.join(img_path_str);
 
         if fs::read(img_path.clone()).is_ok() {
-            let (optimized_data, img_format) = match optimize_image(&img_path) {
-                Ok(result) => result,
-                Err(e) => {
-                    eprintln!("Warning: Failed to optimize image {}: {}", img_path.display(), e);
-                    (fs::read(img_path.clone()).unwrap(), ImageFormat::Png) // default to PNG if optimization fails
-                }
-            };
-            
-            let encoded = base64::encode(&optimized_data);
-            let prefix = get_data_url_prefix(img_format);
-            let data_url = format!("{}{}", prefix, encoded);
-            html_output.replace_range((start + img_tag_pattern.len())..end, &data_url);
+            tasks.push((start, end, img_path.to_path_buf()));
         }
 
         index = end + 1;
     }
+
+    let html_output_arc = Arc::new(Mutex::new(html_output.clone()));
+
+    tasks.into_par_iter().for_each(|(start, end, img_path)| {
+        match optimize_image(&img_path, quality) {
+            Ok((optimized_data, img_format)) => {
+                let encoded = base64::encode(&optimized_data);
+                let prefix = get_data_url_prefix(img_format);
+                let data_url = format!("{}{}", prefix, encoded);
+
+                let mut html_output = html_output_arc.lock().expect("Failed to lock mutex");
+                html_output.replace_range((start + img_tag_pattern.len())..end, &data_url);
+                info!("Embedded image {} as base64", img_path.display());
+            },
+            Err(e) => {
+                warn!("Failed to optimize image {}: {}", img_path.display(), e);
+            }
+        }
+    });
+
+    let final_html_output = Arc::try_unwrap(html_output_arc).expect("Failed to unwrap Arc").into_inner().expect("Failed to get inner value from Mutex");
+    *html_output = final_html_output;
 }
 
 fn get_data_url_prefix(format: ImageFormat) -> &'static str {
@@ -74,5 +95,32 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
         ImageFormat::Farbfeld => "data:image/ff;base64,",
         ImageFormat::Ico => "data:image/ico;base64",
         _ => "data:image/png;base64,", // default to PNG
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::Write;
+
+    #[test]
+    fn test_optimize_image() {
+        let img_path = Path::new("test.png");
+        let (data, format) = optimize_image(img_path, Some(75)).unwrap();
+        assert_eq!(format, ImageFormat::Jpeg);
+        assert!(!data.is_empty());
+
+        // Save the optimized image for manual inspection
+        let mut file = File::create("optimized_test.jpg").unwrap();
+        file.write_all(&data).unwrap();
+    }
+
+    #[test]
+    fn test_embed_images_as_base64() {
+        let base_path = Path::new(".");
+        let mut html_output = String::from("<html><body><img src=\"test.png\"></body></html>");
+        embed_images_as_base64(&mut html_output, base_path, Some(75));
+        assert!(html_output.contains("data:image/jpeg;base64,"));
     }
 }

@@ -4,18 +4,19 @@ Thank you for considering contributing to TextScribe!
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
+- [Contributing to TextScribe](#contributing-to-textscribe)
+  - [Table of Contents](#table-of-contents)
+  - [Code of Conduct](#code-of-conduct)
+  - [Getting Started](#getting-started)
     - [For PR](#for-pr)
-    - [For Issue](#for-issue)
-- [Contributing Guidelines](#contributing-guidelines)
-  - [Code Style](#code-style)
-  - [Variable Names](#variable-names)
-  - [Documentation](#documentation)
-  - [Testing](#testing)
-- [Submitting a Pull Request](#submitting-a-pull-request)
-- [Spam and Invalid Contributions](#spam-and-invalid-contributions)
-- [Contact](#contact)
+  - [Contributing Guidelines](#contributing-guidelines)
+    - [Code Style](#code-style)
+    - [Variable Names](#variable-names)
+    - [Documentation](#documentation)
+    - [Testing](#testing)
+  - [Submitting a Pull Request](#submitting-a-pull-request)
+  - [Spam and Invalid Contributions](#spam-and-invalid-contributions)
+  - [Contact](#contact)
 
 ## Code of Conduct
 
