@@ -49,6 +49,9 @@ fn run(matches: clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     let base_path = Path::new(input_file_path).parent().unwrap_or_else(|| Path::new("."));
     image::embed_images_as_base64(&mut html, base_path, Some(85));
 
+    let author = "Author";
+    let title = "Sample";
+
     // Apply syntax highlighting
     html = highlighting::apply_syntax_highlighting(&html);
 
@@ -58,7 +61,7 @@ fn run(matches: clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
 
     if matches.is_present("epub") {
         let output_epub_path = "output.epub";
-        epub::convert_to_epub(&html, output_epub_path)?;
+        epub::convert_to_epub(&html, output_epub_path,author,title)?;
     }
 
     if matches.is_present("pdf") {

@@ -1392,7 +1392,7 @@ dependencies = [
 
 [[package]]
 name = "textscribe"
-version = "0.1.0"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "arc",
@@ -1405,6 +1405,7 @@ dependencies = [
  "log 0.4.21",
  "pulldown-cmark",
  "rayon",
+ "regex",
  "syntect",
  "webbrowser",
 ]
