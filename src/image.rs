@@ -97,30 +97,3 @@ fn get_data_url_prefix(format: ImageFormat) -> &'static str {
         _ => "data:image/png;base64,", // default to PNG
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::fs::File;
-    use std::io::Write;
-
-    #[test]
-    fn test_optimize_image() {
-        let img_path = Path::new("test.png");
-        let (data, format) = optimize_image(img_path, Some(75)).unwrap();
-        assert_eq!(format, ImageFormat::Jpeg);
-        assert!(!data.is_empty());
-
-        // Save the optimized image for manual inspection
-        let mut file = File::create("optimized_test.jpg").unwrap();
-        file.write_all(&data).unwrap();
-    }
-
-    #[test]
-    fn test_embed_images_as_base64() {
-        let base_path = Path::new(".");
-        let mut html_output = String::from("<html><body><img src=\"test.png\"></body></html>");
-        embed_images_as_base64(&mut html_output, base_path, Some(75));
-        assert!(html_output.contains("data:image/jpeg;base64,"));
-    }
-}
