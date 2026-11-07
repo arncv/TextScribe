@@ -1,152 +1,58 @@
-TextScribe - Markdown Converter
-==========================
+# TextScribe
 
-![logo](https://i.imgur.com/FU0mh9C.png)
+Convert UTF-8 Markdown to HTML, EPUB, or PDF on stable Rust.
 
-The Markdown Converter is a robust command-line utility built with Rust. It's designed to transform Markdown files into HTML, EPUB & PDF format effortlessly. With the power of the 'pulldown-cmark' crate, it ensures accurate parsing and rendering of Markdown content.
-
-## Table of Contents
-
-- [🌟 Features](#🌟-features)
-- [🚀 Installation](#🚀-installation)
-- [🛠 Usage](#🛠-usage)
-    - [Example](example)
-- [🎨 Options](#🎨-options)
-- [🚧 Future Roadmap](#🚧-future-roadmap)
-- [🤝 Contributing](#🤝-contributing)
-- [📜 License](#📜-license)
-
-🌟 Features
------------
-
-* **Swift Conversion**: Instantly convert your Markdown files into HTML, PDF & EPUB.
-
-* **Intuitive Interface**: A user-friendly command-line interface powered by the `clap` crate.
-
-* **Rich Markdown Support**: Supports a wide range of Markdown syntax, including headings, paragraphs, lists, emphasis, links, images (with Base64 embedding), and code blocks.
-
-* [**Customization Options**](#🎨-options): Choose specific Markdown features like tables and strikethrough using the `pulldown-cmark` Options.
-
-* **Flexible Output**: Save the generated HTML or EPUB to a specified location, copy it directly to the clipboard, or preview it in your default web browser.
-
-* **Theming**: Style your HTML output with different themes.
-
-🚀 Installation
----------------
-
-1. **Setup Rust Environment**: If you haven't installed Rust and Cargo, get them from [Rust's official website](https://www.rust-lang.org/).
-2. **Clone the Repository**:
-
-    ```console
-    git clone https://github.com/arncv/TextScribe.git
-    ```
-
-3. **Navigate to the Project Directory**:
-
-    ```console
-    cd TextScribe
-    ```
-
-4. **Compile the Project**:
-
-    ```console
-    cargo build --release
-    ```
-
-🛠 Usage
---------
-
-To convert your Markdown to HTML or EPUB, use the following command:
-
-```console
-cargo run --release -- -i <input-file> [-o <output-file>] [--theme <theme-name>] [--clipboard] [--browser] [--epub]
+```sh
+cargo build --release
+textscribe doc.md > doc.html
+textscribe < doc.md | gzip > doc.html.gz
+textscribe doc.md --theme dark --embed-resources -o doc.html
+textscribe doc.md --format epub -o doc.epub
+textscribe doc.md --format pdf --pdf-engine /usr/bin/chromium -o doc.pdf
 ```
 
-* `<input-file>`: Path to your Markdown file.
-* `<output-file>`: (Optional) Path for the HTML output. If not provided and neither clipboard nor browser options are used, an error will be prompted.
-* `--theme <theme-name>`: Choose a theme (options: default, dark, light).
-* `--clipboard`: Copy the generated HTML directly to the clipboard.
-* `--browser`: Preview the generated HTML in your default web browser.
-* `--epub`: Generate an EPUB file. Perfect for readers.
+Input defaults to stdin; `-` also selects stdin. Output defaults to stdout,
+except with `--clipboard` or `--browser`; `-o` can be combined with either.
+Diagnostics and `--verbose` byte counts go to stderr. Broken pipes exit cleanly.
 
-### **Example:**
+HTML defaults to a complete responsive document with an automatic light/dark
+theme. Use `--fragment` for just the body. Fenced code gets escaped text and
+language classes; no JavaScript or syntax-highlighting runtime is included.
+Tables, strikethrough, task lists, and footnotes default on; disable them with
+`--no-tables`, `--no-strikethrough`, `--no-tasklists`, or `--no-footnotes`.
 
-Convert `example.md` to HTML using the dark theme and save it as `output.html`:
+`--embed-resources` (alias `--standalone`) embeds local Markdown images as data
+URLs. Paths resolve against the input's parent, or the working directory for
+stdin. `--resource-root` overrides that root. Canonical paths, including symlink
+targets, must remain within the root. Remote URLs and percent-encoded paths
+are rejected when embedding. Ordinary HTML output leaves image URLs unchanged.
+Raw Markdown HTML is trusted and passed through; this is not an HTML sanitizer.
+Only Markdown image events are embedded, not raw HTML/CSS references.
 
-```console
-cargo run --release -- -i example.md -o output.html --theme dark
+EPUB packages local images as archive resources regardless of the HTML embedding
+flag, and escapes raw HTML to preserve XHTML validity. Remote images must first
+be downloaded into the resource root. Archives stream into a temporary seekable
+file before being copied to the selected destination; the archive is never held
+in memory. Markdown and rendered HTML are held in memory because parsing and
+image rewriting need document context. Temporary staging also prevents parse
+errors from truncating the destination and supports binary stdout piping.
+
+PDF needs an explicitly configured Chromium-compatible executable. It embeds
+local images and uses an isolated temporary directory. Chromium must have a
+working sandbox in the execution environment. Engine diagnostics use stderr.
+
+Clipboard uses `wl-copy` on Wayland or `xclip` on X11. Browser mode uses
+`xdg-open` and retains a temporary HTML file so asynchronous browsers can read it;
+its path is printed to stderr for later removal. These optional integrations
+currently target Linux desktops. Paths are passed as process arguments, never
+interpreted as shell commands.
+
+Dependencies: clap for CLI parsing, pulldown-cmark for Markdown, thiserror and
+anyhow for errors, base64 for inline images, zip (stored entries, no compression
+backend) for EPUB, and tempfile for safe staging.
+
+```sh
+cargo test
+cargo check
+cargo clippy --all-targets -- -D warnings
 ```
-
-To copy the output directly to the clipboard:
-
-```console
-cargo run --release -- -i example.md --clipboard
-```
-
-To preview the output in your default web browser:
-
-```console
-cargo run --release -- -i example.md --browser
-```
-
-Convert `example.md` to EPUB using the dark theme and save it as `output.epub`:
-
-```console
-cargo run --release -- -i example.md -o output.epub --theme dark --epub
-```
-
-🎨 Options
-----------
-
-* **Theming**: Style your HTML output.
-
-    ```console
-    cargo run --release -- -i <input-file> -o <output-file> --theme <theme-name>
-    ```
-
-* **Tables**: Enable table formatting in your Markdown.
-
-    ```console
-    cargo run --release -- -i <input-file> -o <output-file> --tables
-    ```
-
-* **Strikethrough**: Enable strikethrough formatting.
-
-    ```console
-    cargo run --release -- -i <input-file> -o <output-file> --strikethrough
-    ```
-
-* **Clipboard Output**: Copy the generated HTML to the clipboard.
-
-    ```console
-    cargo run --release -- -i <input-file> --clipboard
-    ```
-
-* **Browser Preview**: View the generated HTML in your default web browser.
-
-    ```console
-    cargo run --release -- -i <input-file> --browser
-    ```
-
-🚧 Future Roadmap
------------------
-
-* ✅ **Support more image types**: Support for more image types ; GIFs, PNG, JPEG.
-* ✅ **Improved Error Handling**:  Improved functionality & logging for errors.
-* ✅ **PDF Conversion**: Integrate functionality to convert the generated HTML into PDF format.
-* - [ ] **Extended Theming**: Introduce more themes and customization options for the HTML output.
-* - [ ] **Interactive GUI**: Develop a graphical user interface for users who prefer GUI over CLI.
-* - [ ] **Enhanced Image Support**: Improve image embedding with options for resizing, alignment, and captions.
-
-We're always open to suggestions and feedback. If you have an idea that's not listed here, please share it with us!
-
-🤝 Contributing
----------------
-
-Contributions are always welcome! Whether it's a feature request, bug fix, or a new idea, feel free to submit a pull request or open an issue. Let's enhance this tool together!
-Be sure to read [CONTRIBUTING](CONTRIBUTING.md) file to know about more contributions details.
-
-📜 License
-----------
-
-This project is licensed under the [MIT License](LICENSE).
