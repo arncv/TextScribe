@@ -17,6 +17,7 @@ fn main() {
 
     if let Err(e) = run(matches) {
         eprintln!("Application error: {}", e);
+        std::process::exit(1);
     }
 
     let duration = start_time.elapsed();
@@ -65,7 +66,7 @@ fn run(matches: clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if matches.is_present("pdf") {
-        utils::export_html_to_pdf(&html, "output.pdf")?;
+        utils::export_html_to_pdf(&html, matches.value_of("pdf_name").unwrap_or("output.pdf"))?;
     }
 
     if let Some(output_path) = output_file_path {
@@ -76,8 +77,8 @@ fn run(matches: clap::ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
                 eprintln!("Failed to open the HTML in the default browser.");
             }
         }
-    } else if !use_clipboard {
-        eprintln!("Please specify an output file or use the --clipboard or --browser option.");
+    } else if !use_clipboard && !matches.is_present("epub") && !matches.is_present("pdf") {
+        return Err("Please specify an output file or use --clipboard, --epub, or --pdf".into());
     }
 
     Ok(())

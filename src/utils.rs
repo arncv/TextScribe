@@ -1,6 +1,8 @@
 // src/utils.rs
 use std::fs;
 use std::process::Command;
+use std::process::Stdio;
+use std::io::Write;
 use clipboard::{ClipboardProvider, ClipboardContext};
 
 pub fn get_theme_css(theme: &str) -> &str {
@@ -30,19 +32,21 @@ pub fn copy_to_clipboard(html: &str) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn export_html_to_pdf(_html: &str, output_pdf_path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let _ = _html;
-    let output = Command::new("wkhtmltopdf")
-        .arg("example.html") 
+pub fn export_html_to_pdf(html: &str, output_pdf_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let mut child = Command::new("wkhtmltopdf")
+        .arg("-")
         .arg(output_pdf_path)
-        .output()?;
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()?;
+    child.stdin.take().expect("piped stdin").write_all(html.as_bytes())?;
+    let output = child.wait_with_output()?;
     
     if output.status.success() {
         println!("Successfully exported to PDF: {}", output_pdf_path);
     } else {
-        eprintln!("Failed to export to PDF");
-        eprintln!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-        eprintln!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        return Err(format!("PDF export failed ({}): {}", output.status, String::from_utf8_lossy(&output.stderr)).into());
     }
 
     Ok(())
